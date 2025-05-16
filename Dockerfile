@@ -1,34 +1,41 @@
-FROM node:lts-alpine3.18 as base
-WORKDIR /usr/src/wpp-server
-ENV NODE_ENV=production PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-COPY package.json ./
+FROM node:22.15.0-alpine as builder
+WORKDIR /usr/src/app
+
+# Clona o repositório oficial e instala as dependências
+RUN apk add git && \
+    git clone https://github.com/wppconnect-team/wppconnect-server.git . && \
+    yarn install --ignore-engines && \
+    yarn build
+
+FROM node:22.15.0-alpine
+WORKDIR /usr/src/app
+
 RUN apk update && \
     apk add --no-cache \
-    vips-dev \
-    fftw-dev \
-    gcc \
-    g++ \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    nodejs \
+    yarn \
+    udev \
+    bash \
+    curl \
+    git \
+    python3 \
     make \
-    libc6-compat \
-    && rm -rf /var/cache/apk/*
-RUN yarn install --production --pure-lockfile && \
-    yarn add sharp --ignore-engines && \
-    yarn cache clean
+    g++ \
+    vips-dev \
+    fftw-dev
 
-FROM base as build
-WORKDIR /usr/src/wpp-server
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-COPY package.json  ./
-RUN yarn install --production=false --pure-lockfile
-RUN yarn cache clean
-COPY . .
-RUN yarn build
+COPY --from=builder /usr/src/app .
 
-FROM base
-WORKDIR /usr/src/wpp-server/
-RUN apk add --no-cache chromium
-RUN yarn cache clean
-COPY . .
-COPY --from=build /usr/src/wpp-server/ /usr/src/wpp-server/
-EXPOSE 21465
-ENTRYPOINT ["node", "dist/server.js"]
+ENV PORT=3010 \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+EXPOSE 3010
+
+CMD ["yarn", "start"]

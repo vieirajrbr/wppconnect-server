@@ -1,16 +1,18 @@
-version: "3"
+version: '3.8'
 
 services:
-  wppconnect:
-    container_name: wpp-server
-    restart: unless-stopped
-    build:
-      context: .
-    volumes:
-      - ./config.ts:/usr/src/wpp-server/config.ts
-      - ./wppconnect_tokens:/usr/src/wpp-server/tokens
+  wppconnect-server:
+    container_name: wppconnect-server
+    build: .
     ports:
-      - "21465:21465"
+      - '3010:3010'
+    environment:
+      - PORT=3010
+      - SECRET_KEY=defaultsecret
+    networks:
+      - sirio-net
+    restart: unless-stopped
 
-volumes:
-  wppconnect_tokens: {}      
+networks:
+  sirio-net:
+    external: true

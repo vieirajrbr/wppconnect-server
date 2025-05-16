@@ -13,7 +13,7 @@
     "changelog:preview": "conventional-changelog -p angular -u",
     "changelog:update": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "commit": "git-cz",
-    "dev": "tsx watch src/server.ts",
+    "dev": "cross-env SECRET_KEY=supersecreto123 tsx watch src/server.ts",
     "docs": "tsx src/swagger.ts",
     "license:add": "license-check-and-add add",
     "license:check": "license-check-and-add check",

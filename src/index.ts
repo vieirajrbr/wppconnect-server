@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+console.log('[DEBUG] SECRET_KEY carregada:', process.env.SECRET_KEY);
+
 import { defaultLogger } from '@wppconnect-team/wppconnect';
 import cors from 'cors';
 import express, { Express, NextFunction, Router } from 'express';
